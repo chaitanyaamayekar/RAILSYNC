@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-inter text-railway-dark bg-gray-50;
+  }
+}
+
+@layer components {
+  .railway-card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300;
+  }
+
+  .railway-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-railway-blue focus:border-transparent outline-none transition-all;
+  }
+
+  .railway-btn {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .railway-btn-primary {
+    @apply railway-btn bg-railway-blue text-white hover:bg-blue-700 active:scale-95;
+  }
+
+  .railway-btn-secondary {
+    @apply railway-btn bg-white text-railway-blue border border-railway-blue hover:bg-railway-blue hover:text-white;
+  }
+
+  .railway-stepper {
+    @apply flex items-center w-full mb-8;
+  }
+
+  .railway-stepper-step {
+    @apply flex items-center;
+  }
+
+  .stepper-number {
+    @apply w-10 h-10 rounded-full border-2 flex items-center justify-center font-semibold text-lg;
+  }
+
+  .stepper-line {
+    @apply h-0.5 flex-1 bg-gray-300;
+  }
+
+  .step-active .stepper-number {
+    @apply bg-railway-blue text-white border-railway-blue;
+  }
+
+  .step-completed .stepper-number {
+    @apply bg-railway-green text-white border-railway-green;
+  }
+
+  .step-inactive .stepper-number {
+    @apply bg-gray-100 text-gray-400 border-gray-300;
+  }
+
+  .railway-table {
+    @apply w-full border-collapse;
+  }
+
+  .railway-table th {
+    @apply bg-railway-blue/10 text-railway-blue font-semibold p-4 text-left border-b;
+  }
+
+  .railway-table td {
+    @apply p-4 border-b border-gray-200;
+  }
+
+  .railway-badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-pending {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-approved {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-rejected {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .train-animation {
+    @apply absolute -top-24 -left-24 w-48 h-48 opacity-5;
+    background: linear-gradient(45deg, transparent 50%, #0B5ED7 50%);
+    animation: trainMove 20s linear infinite;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-railway-blue rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-blue-700;
+}
