@@ -1,41 +1,32 @@
 import { v2 as cloudinary } from "cloudinary";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+export const initCloudinary = () => {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
 
-export const uploadToCloudinary = async (
-  fileBuffer,
-  folder = "railsync-documents"
-) => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          resource_type: "auto",
-          folder,
-          allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-          transformation: [{ quality: "auto", fetch_format: "auto" }],
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      )
-      .end(fileBuffer);
+  console.log("Cloudinary ENV CHECK →", {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY ? "OK" : "MISSING",
+    api_secret: process.env.CLOUDINARY_API_SECRET ? "OK" : "MISSING",
   });
 };
 
-export const deleteFromCloudinary = async (publicId) => {
-  try {
-    await cloudinary.uploader.destroy(publicId);
-    return true;
-  } catch (error) {
-    console.error("Error deleting from Cloudinary:", error);
-    return false;
-  }
+export const uploadToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    
+    cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    ).end(buffer);
+  });
 };
 
-export { cloudinary };
+export const deleteFromCloudinary = (publicId) => {
+  return cloudinary.uploader.destroy(publicId);
+};

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#1a1a2e"/>
+  <g transform="translate(50, 50)">
+    <!-- Train icon -->
+    <rect x="-30" y="-15" width="20" height="20" fill="#e74c3c" rx="2"/>
+    <rect x="-5" y="-15" width="25" height="20" fill="#e74c3c" rx="2"/>
+    <rect x="25" y="-15" width="20" height="20" fill="#e74c3c" rx="2"/>
+    <!-- Wheels -->
+    <circle cx="-25" cy="15" r="6" fill="#34495e"/>
+    <circle cx="-5" cy="15" r="6" fill="#34495e"/>
+    <circle cx="15" cy="15" r="6" fill="#34495e"/>
+    <circle cx="35" cy="15" r="6" fill="#34495e"/>
+    <!-- Track -->
+    <line x1="-45" y1="22" x2="45" y2="22" stroke="#7f8c8d" stroke-width="2"/>
+    <line x1="-45" y1="26" x2="45" y2="26" stroke="#7f8c8d" stroke-width="2"/>
+  </g>
+</svg>

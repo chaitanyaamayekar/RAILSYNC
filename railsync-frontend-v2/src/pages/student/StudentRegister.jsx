@@ -36,16 +36,52 @@ const StudentRegister = () => {
       address: '',
     },
     validationSchema,
-    onSubmit: async (values) => {
-      setLoading(true)
-      // Simulate API call
-      setTimeout(() => {
-        toast.success('Registration successful! Please login.')
-        navigate('/student/login')
-        setLoading(false)
-      }, 1500)
-    },
+    // onSubmit: async (values) => {
+    //   setLoading(true)
+    //   // Simulate API call
+    //   setTimeout(() => {
+    //     toast.success('Registration successful! Please login.')
+    //     navigate('/student/login')
+    //     setLoading(false)
+    //   }, 1500)
+    // },
+   onSubmit: async (values) => {
+  setLoading(true);
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        college: values.college,
+        studentId: values.studentId,
+        year: values.year,
+        address: values.address
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Registration failed");
+    }
+
+    toast.success("Registration successful! Please login.");
+    navigate("/student/login");
+
+  } catch (error) {
+    toast.error(error.message);
+  } finally {
+    setLoading(false);
+  }
+}
   })
+
+
 
   const colleges = [
     'University of Mumbai',

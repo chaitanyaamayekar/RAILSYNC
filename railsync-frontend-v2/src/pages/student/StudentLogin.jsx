@@ -18,28 +18,51 @@ const StudentLogin = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   dispatch(loginStart());
+
+  //   // 🔁 MOCK API (replace later)
+  //   setTimeout(() => {
+  //     dispatch(
+  //       loginSuccess({
+  //         user: {
+  //           id: 1,
+  //           name: "Student User",
+  //           email: formData.email,
+  //         },
+  //         token: "student-demo-token",
+  //         role: "student",
+  //       })
+  //     );
+
+  //     navigate("/student/dashboard", { replace: true });
+  //   }, 1000);
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    dispatch(loginStart());
+  e.preventDefault();
+  setLoading(true);
+  dispatch(loginStart());
 
-    // 🔁 MOCK API (replace later)
-    setTimeout(() => {
-      dispatch(
-        loginSuccess({
-          user: {
-            id: 1,
-            name: "Student User",
-            email: formData.email,
-          },
-          token: "student-demo-token",
-          role: "student",
-        })
-      );
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    });
 
-      navigate("/student/dashboard", { replace: true });
-    }, 1000);
-  };
+    const data = await res.json();
+
+    dispatch(loginSuccess(data));
+    navigate("/student/dashboard", { replace: true });
+  } catch (err) {
+    alert("Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-railway-blue/10 to-white flex items-center justify-center p-4">
@@ -124,7 +147,7 @@ const StudentLogin = () => {
               type="submit"
               disabled={loading}
               className="w-full railway-btn-primary py-3 text-lg"
-            >
+                          >
               {loading ? "Logging in..." : "Login to Dashboard"}
             </button>
           </form>

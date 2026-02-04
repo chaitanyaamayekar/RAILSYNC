@@ -26,7 +26,7 @@ const ApplicationDetail = () => {
   const application = {
     id: id || 'RSC202400123',
     student: {
-      name: 'Rajesh Kumar',
+      name: 'someone one',
       email: 'rajesh.kumar@mumbaiuniversity.edu',
       phone: '9876543210',
       studentId: 'MU202300456',

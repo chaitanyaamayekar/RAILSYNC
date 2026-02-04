@@ -1,20 +1,25 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config()
+import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
+console.log("ENV TEST:", process.env.CLOUDINARY_API_KEY);
 
+//import {uploadToCloudinary} from "./config/cloudinary.js";
 import authRoutes from "./routes/authRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import { initCloudinary } from "./config/cloudinary.js";
 
-dotenv.config();
+initCloudinary();
+
 connectDB();
-
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "http://localhost:5173"],
   credentials: true
 }));
 
@@ -28,6 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/application", applicationRoutes);
+app.use("/api/documents", documentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

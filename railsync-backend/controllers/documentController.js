@@ -5,63 +5,63 @@ import logger from "../utils/logger.js";
 import Notification from "../models/Notification.js";
 
 // Upload document
-export const uploadDocument = async (req, res) => {
+export const uploadDocuments = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
     }
 
-    const { documentType, applicationId } = req.body;
+    const { applicationId } = req.params;
     const userId = req.user._id;
 
-    const validTypes = [
-      "id_proof",
-      "address_proof",
-      "bonafide_certificate",
-      "photo",
-      "other"
-    ];
+    const typeMap = {
+      idProof: "id_proof",
+      addressProof: "address_proof",
+      bonafideCertificate: "bonafide_certificate",
+    };
 
-    if (!validTypes.includes(documentType)) {
-      return res.status(400).json({ message: "Invalid document type" });
+    const uploadedDocs = [];
+
+    for (const field in req.files) {
+      const file = req.files[field][0];
+      const documentType = typeMap[field];
+
+      const cloudinaryResult = await uploadToCloudinary(
+        file.buffer,
+        "railsync-documents"
+      );
+
+      const document = await Document.create({
+        student: userId,
+        application: applicationId,
+        documentType,
+        fileName: cloudinaryResult.original_filename,
+        originalName: file.originalname,
+        fileUrl: cloudinaryResult.secure_url,
+        publicId: cloudinaryResult.public_id,
+        mimeType: file.mimetype,
+        size: file.size,
+      });
+
+      uploadedDocs.push(document);
+
+      await Application.findByIdAndUpdate(applicationId, {
+        $set: {
+          [`documents.${documentType}`]: {
+            url: cloudinaryResult.secure_url,
+            publicId: cloudinaryResult.public_id,
+            verified: false,
+          },
+        },
+      });
     }
 
-    const cloudinaryResult = await uploadToCloudinary(
-      req.file.buffer,
-      "railsync-documents"
-    );
-
-    const document = await Document.create({
-      student: userId,
-      application: applicationId,
-      documentType,
-      fileName: cloudinaryResult.original_filename,
-      originalName: req.file.originalname,
-      fileUrl: cloudinaryResult.secure_url,
-      publicId: cloudinaryResult.public_id,
-      mimeType: req.file.mimetype,
-      size: req.file.size
+    res.status(201).json({
+      message: "Documents uploaded successfully",
+      documents: uploadedDocs,
     });
-
-    if (applicationId) {
-      const application = await Application.findById(applicationId);
-      if (application) {
-        application.documents[documentType] = {
-          url: cloudinaryResult.secure_url,
-          publicId: cloudinaryResult.public_id,
-          verified: false
-        };
-        await application.save();
-      }
-    }
-
-    logger.applicationLog("DOCUMENT_UPLOAD", applicationId, userId, {
-      documentType
-    });
-
-    res.status(201).json({ document });
   } catch (error) {
-    logger.errorLog(error, req);
+    console.error(error);
     res.status(500).json({ message: "Document upload failed" });
   }
 };
