@@ -1,22 +1,51 @@
 import Application from "../models/Application.js";
 
-export const getAllApplications = async (req, res, next) => {
+export const getAdminDashboard = async (req, res) => {
   try {
-    const applications = await Application.find().populate(
-      "student",
-      "name email"
-    );
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Admin access only" });
+    }
 
-    res.json({
-      success: true,
-      data: applications,
+    const applications = await Application.find()
+      .populate("student", "name email")
+      .sort({ createdAt: -1 });
+
+    const stats = {
+      total: applications.length,
+      pending: applications.filter(a => a.status === "pending").length,
+      approved: applications.filter(a => a.status === "approved").length,
+      rejected: applications.filter(a => a.status === "rejected").length,
+    };
+
+    res.status(200).json({
+      stats,
+      recentApplications: applications.slice(0, 5),
     });
+
   } catch (error) {
-    next(error);
+    console.error("ADMIN DASHBOARD ERROR:", error);
+    res.status(500).json({ message: "Dashboard fetch failed" });
   }
 };
 
-export const approveApplication = async (req, res, next) => {
+
+/**
+ * GET /api/admin/applications
+ */
+export const getAllApplications = async (req, res) => {
+  try {
+    const apps = await Application.find().sort({ createdAt: -1 });
+    res.status(200).json(apps);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch applications" });
+  }
+};
+
+
+/**
+ * PUT /api/admin/approve/:id
+ */
+export const approveApplication = async (req, res) => {
   try {
     const application = await Application.findByIdAndUpdate(
       req.params.id,
@@ -24,17 +53,21 @@ export const approveApplication = async (req, res, next) => {
       { new: true }
     );
 
-    res.json({
-      success: true,
-      message: "Application approved",
-      data: application,
-    });
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
+
+    res.status(200).json({ message: "Application approved", application });
   } catch (error) {
-    next(error);
+    console.error("APPROVE ERROR:", error);
+    res.status(500).json({ message: "Approval failed" });
   }
 };
 
-export const rejectApplication = async (req, res, next) => {
+
+/**
+ * PUT /api/admin/reject/:id
+ */
+export const rejectApplication = async (req, res) => {
   try {
     const application = await Application.findByIdAndUpdate(
       req.params.id,
@@ -42,12 +75,12 @@ export const rejectApplication = async (req, res, next) => {
       { new: true }
     );
 
-    res.json({
-      success: true,
-      message: "Application rejected",
-      data: application,
-    });
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
+
+    res.status(200).json({ message: "Application rejected", application });
   } catch (error) {
-    next(error);
+    console.error("REJECT ERROR:", error);
+    res.status(500).json({ message: "Rejection failed" });
   }
 };

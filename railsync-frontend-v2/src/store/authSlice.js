@@ -87,7 +87,10 @@ const authSlice = createSlice({
       state.token = null;
       state.role = null;
 
-      localStorage.clear();
+      //localStorage.clear();
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
     }
   }
 });

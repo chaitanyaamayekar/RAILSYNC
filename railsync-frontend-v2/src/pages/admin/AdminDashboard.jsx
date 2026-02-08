@@ -1,200 +1,151 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+// export default AdminDashboard
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import {
   FaTrain,
-  FaUsers,
   FaFileAlt,
   FaClock,
   FaCheckCircle,
   FaTimesCircle,
-  FaChartLine,
   FaBell,
-} from 'react-icons/fa'
+} from "react-icons/fa";
 
 const AdminDashboard = () => {
-  // Mock data
-  const stats = {
-    total: 1567,
-    pending: 89,
-    approved: 1320,
-    rejected: 158,
-  }
+  const { token } = useSelector((state) => state.auth);
 
-  const recentApplications = [
-    {
-      id: 'RSC202400123',
-      student: 'Rajesh Kumar',
-      college: 'Mumbai University',
-      submitted: '2024-01-15',
-      status: 'pending',
-    },
-    {
-      id: 'RSC202400122',
-      student: 'Priya Sharma',
-      college: 'SNDT University',
-      submitted: '2024-01-14',
-      status: 'approved',
-    },
-    {
-      id: 'RSC202400121',
-      student: 'Amit Patel',
-      college: 'MUICT',
-      submitted: '2024-01-14',
-      status: 'rejected',
-    },
-    {
-      id: 'RSC202400120',
-      student: 'Sneha Desai',
-      college: 'Wilson College',
-      submitted: '2024-01-13',
-      status: 'approved',
-    },
-  ]
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  });
 
-  const alerts = [
-    {
-      id: 1,
-      type: 'warning',
-      message: '5 applications pending for more than 3 days',
-    },
-    {
-      id: 2,
-      type: 'info',
-      message: 'Weekly report generated successfully',
-    },
-  ]
+  const [recentApplications, setRecentApplications] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      pending: 'badge-pending',
-      approved: 'badge-approved',
-      rejected: 'badge-rejected',
-    }
+  /* ================= FETCH DASHBOARD DATA ================= */
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const { data } = await axios.get(
+          "http://localhost:5000/api/admin/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setStats(data.stats || stats);
+        setRecentApplications(data.recentApplications || []);
+        setAlerts(data.alerts || []);
+      } catch (err) {
+        console.error("Admin dashboard load failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, [token]);
+
+  const statusBadge = {
+    pending: "badge-pending",
+    approved: "badge-approved",
+    rejected: "badge-rejected",
+  };
+
+  if (loading) {
     return (
-      <span className={`railway-badge ${styles[status]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    )
+      <div className="min-h-screen flex items-center justify-center text-lg">
+        Loading admin dashboard...
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <FaTrain className="text-3xl text-railway-dark" />
-              <div>
-                <h1 className="text-2xl font-bold text-railway-dark">
-                  Admin Dashboard
-                </h1>
-                <p className="text-gray-600">Railway Concession Management System</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Logged in as</div>
-              <div className="font-medium">Railway Department</div>
+      {/* HEADER */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <FaTrain className="text-3xl text-railway-dark" />
+            <div>
+              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              <p className="text-gray-600">
+                Railway Concession Management
+              </p>
             </div>
           </div>
+          <div className="text-sm text-gray-600">Railway Department</div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Grid */}
+        {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="railway-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Applications</p>
-                <p className="text-3xl font-bold text-railway-dark mt-2">{stats.total}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FaFileAlt className="text-2xl text-railway-blue" />
-              </div>
-            </div>
-          </div>
-
-          <div className="railway-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pending Review</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">{stats.pending}</p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <FaClock className="text-2xl text-yellow-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="railway-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Approved</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{stats.approved}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <FaCheckCircle className="text-2xl text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="railway-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Rejected</p>
-                <p className="text-3xl font-bold text-red-600 mt-2">{stats.rejected}</p>
-              </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <FaTimesCircle className="text-2xl text-red-600" />
-              </div>
-            </div>
-          </div>
+          <StatCard
+            title="Total Applications"
+            value={stats.total}
+            icon={<FaFileAlt />}
+            text="text-blue-600"
+            bg="bg-blue-100"
+          />
+          <StatCard
+            title="Pending Review"
+            value={stats.pending}
+            icon={<FaClock />}
+            text="text-yellow-600"
+            bg="bg-yellow-100"
+          />
+          <StatCard
+            title="Approved"
+            value={stats.approved}
+            icon={<FaCheckCircle />}
+            text="text-green-600"
+            bg="bg-green-100"
+          />
+          <StatCard
+            title="Rejected"
+            value={stats.rejected}
+            icon={<FaTimesCircle />}
+            text="text-red-600"
+            bg="bg-red-100"
+          />
         </div>
 
-        {/* Alerts */}
-        <div className="railway-card mb-8">
-          <div className="flex items-center mb-4">
-            <FaBell className="text-xl text-railway-blue mr-3" />
-            <h3 className="text-xl font-bold">System Alerts</h3>
-          </div>
-          <div className="space-y-3">
-            {alerts.map((alert) => (
-              <div
-                key={alert.id}
-                className={`p-4 rounded-lg ${
-                  alert.type === 'warning'
-                    ? 'bg-yellow-50 border border-yellow-200'
-                    : 'bg-blue-50 border border-blue-200'
-                }`}
-              >
-                <div className="flex items-start">
-                  <div
-                    className={`w-2 h-2 rounded-full mt-2 mr-3 ${
-                      alert.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-                    }`}
-                  ></div>
-                  <div>
-                    <p className="font-medium">{alert.message}</p>
-                  </div>
+        {/* ALERTS */}
+        {alerts.length > 0 && (
+          <div className="railway-card mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <FaBell className="text-railway-blue" />
+              <h3 className="font-bold text-lg">System Alerts</h3>
+            </div>
+            <div className="space-y-3">
+              {alerts.map((alert, i) => (
+                <div
+                  key={i}
+                  className="p-4 rounded-lg bg-yellow-50 border border-yellow-200"
+                >
+                  {alert.message}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Recent Applications */}
+        {/* RECENT APPLICATIONS */}
         <div className="railway-card">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="text-xl font-bold">Recent Applications</h3>
-              <p className="text-gray-600">Applications requiring attention</p>
+              <p className="text-gray-600">Latest submissions</p>
             </div>
-            <Link
-              to="/admin/applications"
-              className="railway-btn-primary"
-            >
-              View All Applications
+            <Link to="/admin/applications" className="railway-btn-primary">
+              View All
             </Link>
           </div>
 
@@ -202,90 +153,73 @@ const AdminDashboard = () => {
             <table className="railway-table">
               <thead>
                 <tr>
-                  <th>Application ID</th>
-                  <th>Student Name</th>
+                  <th>ID</th>
+                  <th>Student</th>
                   <th>College</th>
-                  <th>Submitted</th>
+                  <th>Date</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {recentApplications.map((app) => (
-                  <tr key={app.id} className="hover:bg-gray-50">
-                    <td className="font-mono font-medium">{app.id}</td>
-                    <td className="font-medium">{app.student}</td>
+                  <tr key={app._id}>
+                    <td className="font-mono">
+                      {app._id.slice(-6).toUpperCase()}
+                    </td>
+                    <td>{app.student?.name || app.studentName}</td>
                     <td>{app.college}</td>
-                    <td>{app.submitted}</td>
-                    <td>{getStatusBadge(app.status)}</td>
+                    <td>
+                      {new Date(app.createdAt).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <span
+                        className={`railway-badge ${statusBadge[app.status]}`}
+                      >
+                        {app.status}
+                      </span>
+                    </td>
                     <td>
                       <Link
-                        to={`/admin/applications/${app.id}`}
-                        className="text-railway-blue hover:underline font-medium"
+                        to={`/admin/applications/${app._id}`}
+                        className="text-railway-blue font-medium hover:underline"
                       >
-                        View Details
+                        View
                       </Link>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-6 mt-8">
-          <div className="railway-card">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                <FaFileAlt className="text-xl text-railway-blue" />
-              </div>
-              <h4 className="font-bold">Review Applications</h4>
-            </div>
-            <p className="text-gray-600 mb-4">
-              Process pending applications requiring verification
-            </p>
-            <Link
-              to="/admin/applications?status=pending"
-              className="text-railway-blue font-medium hover:underline"
-            >
-              Start Review →
-            </Link>
-          </div>
-
-          <div className="railway-card">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                <FaChartLine className="text-xl text-green-600" />
-              </div>
-              <h4 className="font-bold">Generate Reports</h4>
-            </div>
-            <p className="text-gray-600 mb-4">
-              Download monthly reports and analytics
-            </p>
-            <a href="#" className="text-green-600 font-medium hover:underline">
-              Export Data →
-            </a>
-          </div>
-
-          <div className="railway-card">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                <FaUsers className="text-xl text-purple-600" />
-              </div>
-              <h4 className="font-bold">Manage Users</h4>
-            </div>
-            <p className="text-gray-600 mb-4">
-              Manage college authorities and admin users
-            </p>
-            <a href="#" className="text-purple-600 font-medium hover:underline">
-              User Management →
-            </a>
+            {recentApplications.length === 0 && (
+              <p className="text-center py-6 text-gray-500">
+                No applications found
+              </p>
+            )}
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+/* ================= SAFE STAT CARD ================= */
+const StatCard = ({ title, value, icon, text, bg }) => (
+  <div className="railway-card">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-sm text-gray-600">{title}</p>
+        <p className={`text-3xl font-bold mt-2 ${text}`}>
+          {value}
+        </p>
+      </div>
+      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${bg}`}>
+        {icon}
+      </div>
+    </div>
+  </div>
+);
+
+export default AdminDashboard;
+

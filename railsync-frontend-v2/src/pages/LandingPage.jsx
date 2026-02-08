@@ -86,13 +86,13 @@ const LandingPage = () => {
               </span>
             </Link>
 
-            {/* <Link to="/admin/login" className="railway-card group">
+            <Link to="/admin/login" className="railway-card group">
               <FaUserShield className="text-4xl text-railway-green mb-4" />
               <h3 className="text-xl font-bold">Admin Portal</h3>
               <span className="flex items-center mt-3 text-railway-green">
                 Enter <FaArrowRight className="ml-2" />
               </span>
-            </Link> */}
+            </Link>
           </div>
         </div>
       </div>

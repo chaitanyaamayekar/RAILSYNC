@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginStart, loginSuccess } from "../../store/authSlice";
 import { FaTrain, FaShieldAlt, FaEnvelope, FaLock } from "react-icons/fa";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -18,28 +20,30 @@ const AdminLogin = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    dispatch(loginStart());
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  dispatch(loginStart());
 
-    // 🔁 MOCK API (replace later)
-    setTimeout(() => {
-      dispatch(
-        loginSuccess({
-          user: {
-            id: 1,
-            name: "Admin User",
-            email: formData.email,
-          },
-          token: "admin-demo-token",
-          role: "admin",
-        })
-      );
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/admin/login",
+      formData
+    );
 
-      navigate("/admin/dashboard", { replace: true });
-    }, 1000);
-  };
+    const data = response.data;
+
+    dispatch(loginSuccess(data));
+    toast.success("Welcome Admin");
+    navigate("/admin/dashboard", { replace: true });
+
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-railway-dark to-gray-900 flex items-center justify-center p-4">
