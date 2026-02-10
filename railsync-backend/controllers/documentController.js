@@ -17,7 +17,7 @@ export const uploadDocuments = async (req, res) => {
     const typeMap = {
       idProof: "id_proof",
       addressProof: "address_proof",
-      bonafideCertificate: "bonafide_certificate",
+      previousPass: "previous_pass",
     };
 
     const uploadedDocs = [];

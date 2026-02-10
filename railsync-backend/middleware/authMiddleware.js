@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Admin from "../models/Admin.js";
 
 export const protect = async (req, res, next) => {
   let token;
@@ -13,13 +14,31 @@ export const protect = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.id).select("-password");
+      // ===== ADMIN LOGIN =====
+      if (decoded.role === "admin") {
+        const admin = await Admin.findById(decoded.id).select("-password");
 
-      if (!req.user) {
+        if (!admin) {
+          return res.status(401).json({ message: "Admin not found" });
+        }
+
+        req.user = admin;
+        req.user.role = "admin";
+        return next();
+      }
+
+      // ===== STUDENT LOGIN =====
+      const user = await User.findById(decoded.id).select("-password");
+
+      if (!user) {
         return res.status(401).json({ message: "User not found" });
       }
 
+      req.user = user;
+      req.user.role = "student";
+
       next();
+
     } catch (error) {
       console.error("AUTH ERROR:", error);
       return res.status(401).json({ message: "Invalid token" });

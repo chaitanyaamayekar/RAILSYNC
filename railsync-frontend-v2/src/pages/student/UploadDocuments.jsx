@@ -12,7 +12,7 @@ const UploadDocuments = () => {
   const [documents, setDocuments] = useState({
     idProof: null,
     addressProof: null,
-    bonafideCertificate: null,
+    previousPass: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ const UploadDocuments = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!documents.idProof || !documents.addressProof || !documents.bonafideCertificate) {
+    if (!documents.idProof || !documents.addressProof || !documents.previousPass) {
       toast.error("Please upload all required documents");
       return;
     }
@@ -39,7 +39,7 @@ const UploadDocuments = () => {
       const formData = new FormData();
       formData.append("idProof", documents.idProof);
       formData.append("addressProof", documents.addressProof);
-      formData.append("bonafideCertificate", documents.bonafideCertificate);
+      formData.append("previousPass", documents.previousPass);
 
       await API.post(
         `/documents/upload/${applicationId}`,

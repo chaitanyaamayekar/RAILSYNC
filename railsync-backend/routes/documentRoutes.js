@@ -11,7 +11,7 @@ router.post(
   upload.fields([
     { name: "idProof", maxCount: 1 },
     { name: "addressProof", maxCount: 1 },
-    { name: "bonafideCertificate", maxCount: 1 },
+    { name: "pass", maxCount: 1 },
   ]),
   uploadDocuments
 );

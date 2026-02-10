@@ -17,28 +17,7 @@ const StudentLogin = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   dispatch(loginStart());
-
-  //   // 🔁 MOCK API (replace later)
-  //   setTimeout(() => {
-  //     dispatch(
-  //       loginSuccess({
-  //         user: {
-  //           id: 1,
-  //           name: "Student User",
-  //           email: formData.email,
-  //         },
-  //         token: "student-demo-token",
-  //         role: "student",
-  //       })
-  //     );
-
-  //     navigate("/student/dashboard", { replace: true });
-  //   }, 1000);
+  
   const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);

@@ -1,4 +1,3 @@
-// export default Applications
 import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios"
@@ -22,17 +21,13 @@ const Applications = () => {
   const [search, setSearch] = useState("")
   const [actionLoading, setActionLoading] = useState(null)
 
-  /* ================= FETCH APPLICATIONS (REAL DB) ================= */
+  /* ================= FETCH APPLICATIONS ================= */
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         const { data } = await axios.get(
           "http://localhost:5000/api/admin/applications",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         )
         setApplications(data)
       } catch (error) {
@@ -71,24 +66,12 @@ const Applications = () => {
           ? `http://localhost:5000/api/admin/approve/${id}`
           : `http://localhost:5000/api/admin/reject/${id}`
 
-      await axios.put(
-        url,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      await axios.put(url, {}, { headers: { Authorization: `Bearer ${token}` } })
 
+      // update UI using lowercase (same as DB)
       setApplications((prev) =>
         prev.map((app) =>
-          app._id === id
-            ? {
-                ...app,
-                status: status === "approved" ? "Approved" : "Rejected",
-              }
-            : app
+          app._id === id ? { ...app, status } : app
         )
       )
 
@@ -102,10 +85,13 @@ const Applications = () => {
 
   /* ================= STATUS BADGE ================= */
   const statusBadge = {
-    Pending: "badge-pending",
-    Approved: "badge-approved",
-    Rejected: "badge-rejected",
+    pending: "badge-pending",
+    approved: "badge-approved",
+    rejected: "badge-rejected",
   }
+
+  const formatStatus = (status) =>
+    status?.charAt(0).toUpperCase() + status?.slice(1)
 
   if (loading) {
     return <div className="p-10 text-center">Loading applications...</div>
@@ -114,6 +100,7 @@ const Applications = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
+
         {/* HEADER */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-railway-dark">
@@ -127,10 +114,9 @@ const Applications = () => {
         {/* FILTERS */}
         <div className="railway-card mb-6">
           <div className="grid md:grid-cols-2 gap-6 mb-6">
+
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Search
-              </label>
+              <label className="block text-sm font-medium mb-2">Search</label>
               <div className="relative">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
@@ -162,6 +148,7 @@ const Applications = () => {
                 ))}
               </div>
             </div>
+
           </div>
 
           <div className="flex justify-between text-sm text-gray-600">
@@ -189,6 +176,7 @@ const Applications = () => {
                   <th>Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {filteredApplications.map((app) => (
                   <tr key={app._id}>
@@ -201,24 +189,19 @@ const Applications = () => {
 
                     <td>{app.college}</td>
 
-                    <td>
-                      {app.fromStation} → {app.toStation}
-                    </td>
+                    <td>{app.fromStation} → {app.toStation}</td>
+
+                    <td>{new Date(app.createdAt).toLocaleDateString()}</td>
 
                     <td>
-                      {new Date(app.createdAt).toLocaleDateString()}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`railway-badge ${statusBadge[app.status]}`}
-                      >
-                        {app.status}
+                      <span className={`railway-badge ${statusBadge[app.status]}`}>
+                        {formatStatus(app.status)}
                       </span>
                     </td>
 
                     <td>
                       <div className="flex gap-2">
+
                         <Link
                           to={`/admin/applications/${app._id}`}
                           className="p-2 bg-blue-100 text-blue-600 rounded"
@@ -226,7 +209,7 @@ const Applications = () => {
                           <FaEye />
                         </Link>
 
-                        {app.status === "Pending" && (
+                        {app.status === "pending" && (
                           <>
                             <button
                               disabled={actionLoading === app._id}
@@ -235,6 +218,7 @@ const Applications = () => {
                             >
                               <FaCheck />
                             </button>
+
                             <button
                               disabled={actionLoading === app._id}
                               onClick={() => updateStatus(app._id, "rejected")}
@@ -244,6 +228,7 @@ const Applications = () => {
                             </button>
                           </>
                         )}
+
                       </div>
                     </td>
                   </tr>

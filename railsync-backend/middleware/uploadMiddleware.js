@@ -1,16 +1,4 @@
 import multer from "multer";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "uploads/documents/");
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = path.extname(file.originalname);
-//     cb(null, `${file.fieldname}-${uuidv4()}${ext}`);
-//   }
-// });
 
 const storage = multer.memoryStorage();
 
@@ -28,6 +16,13 @@ export const upload = multer({
 });
 
 export const uploadSingle = (field) => upload.single(field);
+
+// ⭐ ADD THIS
+export const uploadApplicationDocuments = upload.fields([
+  { name: "previousPass", maxCount: 1 },
+  { name: "idCard", maxCount: 1 },
+  { name: "photo", maxCount: 1 }
+]);
 
 export const handleUploadError = (err, req, res, next) => {
   if (err) return res.status(400).json({ message: err.message });
