@@ -77,11 +77,23 @@ export const uploadDocuments = async (req, res) => {
     const idUpload = await uploadToCloudinary(req.files.idCard[0].buffer, "railway_concession");
     const photoUpload = await uploadToCloudinary(req.files.photo[0].buffer, "railway_concession");
 
-    application.documents = {
-      previousPass: passUpload.secure_url,
-      idCard: idUpload.secure_url,
-      photo: photoUpload.secure_url,
-    };
+   application.documents.previous_pass = {
+  url: passUpload.secure_url,
+  publicId: passUpload.public_id,
+  verified: false,
+};
+
+application.documents.id_proof = {
+  url: idUpload.secure_url,
+  publicId: idUpload.public_id,
+  verified: false,
+};
+
+application.documents.address_proof = {
+  url: photoUpload.secure_url,
+  publicId: photoUpload.public_id,
+  verified: false,
+};
 
     // ❌ REMOVE status change
     // application.status = "documents_uploaded";
@@ -103,7 +115,7 @@ export const getMyApplication = async (req, res) => {
   try {
     const application = await Application.findOne({
       student: req.user._id,
-    });
+    }).populate("student", "name email phone college studentId year");
 
     if (!application) {
       return res.status(404).json({ message: "No application found" });
@@ -137,7 +149,26 @@ export const getApplicationById = async (req, res) => {
 /* =========================================
    APPROVE APPLICATION
 ========================================= */
-export const approveApplication = async (req, res) => {
+// export const approveApplication = async (req, res) => {
+//   try {
+//     const application = await Application.findById(req.params.id);
+
+//     if (!application)
+//       return res.status(404).json({ message: "Application not found" });
+
+//     if (application.status !== "pending")
+//      return res.status(400).json({ message: "Already processed" });
+
+//     application.status = "approved";
+//     await application.save();
+
+//     res.json(application);
+//   } catch (err) {
+//     console.error("APPROVE ERROR:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+   export const approveApplication = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id);
 
@@ -145,9 +176,15 @@ export const approveApplication = async (req, res) => {
       return res.status(404).json({ message: "Application not found" });
 
     if (application.status !== "pending")
-     return res.status(400).json({ message: "Already processed" });
+      return res.status(400).json({ message: "Already processed" });
 
+    // 🔥 1. Change status
     application.status = "approved";
+
+    // 🔥 2. Generate concession form (for now dummy URL)
+    application.concessionFormUrl =
+      "https://example.com/concession-form.pdf";
+
     await application.save();
 
     res.json(application);

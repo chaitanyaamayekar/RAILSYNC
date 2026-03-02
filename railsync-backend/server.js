@@ -11,6 +11,7 @@ import studentRoutes from "./routes/studentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import concessionRoutes from "./routes/concessionRoutes.js";
 
 import { initCloudinary } from "./config/cloudinary.js";
 
@@ -34,11 +35,11 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("RailSync Backend Running");
 });
-
+app.use("/api/concession", concessionRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/application", applicationRoutes);
+app.use("/api/applications", applicationRoutes);
 app.use("/api/documents", documentRoutes);
 
 

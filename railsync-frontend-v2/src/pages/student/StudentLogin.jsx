@@ -32,7 +32,9 @@ const StudentLogin = () => {
 
     const data = await res.json();
 
+    //dispatch(loginSuccess(data));
     dispatch(loginSuccess(data));
+
     navigate("/student/dashboard", { replace: true });
   } catch (err) {
     alert("Login failed");

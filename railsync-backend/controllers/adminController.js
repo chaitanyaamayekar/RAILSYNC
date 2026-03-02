@@ -1,4 +1,6 @@
 import Application from "../models/Application.js";
+import Concession from "../models/Concession.js";
+import { generateConcessionPDF } from "../utils/generateConcessionPDF.js";
 
 export const getAdminDashboard = async (req, res) => {
   try {
@@ -49,23 +51,68 @@ export const getAllApplications = async (req, res) => {
 /**
  * PUT /api/admin/approve/:id
  */
-export const approveApplication = async (req, res) => {
+  export const approveApplication = async (req, res) => {
   try {
-    const application = await Application.findByIdAndUpdate(
-      req.params.id,
-      { status: "approved" },
-      { new: true }
-    ).populate("student", "name email phone college studentId year");
+    const application = await Application.findById(req.params.id)
+      .populate("student");
 
     if (!application)
       return res.status(404).json({ message: "Application not found" });
 
-    res.status(200).json(application); // ⚠️ RETURN DIRECT OBJECT (NOT WRAPPED)
-  } catch (error) {
-    console.error("APPROVE ERROR:", error);
-    res.status(500).json({ message: "Approval failed" });
+    if (application.status !== "pending")
+      return res.status(400).json({ message: "Already processed" });
+
+    application.status = "approved";
+    await application.save();
+
+    /* CREATE CONCESSION RECORD */
+    const existingConcession = await Concession.findOne({
+  application: application._id,
+});
+
+if (existingConcession) {
+  return res.status(400).json({ message: "Concession already generated" });
+}
+    /* CREATE CONCESSION RECORD */
+const concession = await Concession.create({
+  application: application._id,   // ✅ ADD THIS (VERY IMPORTANT)
+  student: application.student._id,
+  approvedBy: req.user._id,       // optional but good practice
+
+  name: application.student.name,
+  email: application.student.email,
+  studentId: application.student.studentId,
+  phone: application.student.phone,
+  address: "Mumbai",
+
+  college: application.college,
+  course: application.course,
+  year: application.year,
+
+  fromStation: application.fromStation,
+  toStation: application.toStation,
+  travelClass: application.travelClass,
+  duration: application.duration,
+  concessionType: application.concessionType,
+
+  passNumber: `RS${Date.now()}`,
+  expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+});
+
+    /* GENERATE PDF */
+    const filePath = await generateConcessionPDF(concession);
+
+    concession.pdfUrl = filePath;
+    await concession.save();
+
+    res.json({ message: "Application approved & pass generated" });
+
+  } catch (err) {
+    console.error("APPROVE ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 
 /**
  * PUT /api/admin/reject/:id
@@ -108,4 +155,21 @@ export const getApplicationById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch application" });
   }
 };
+export const getConcessionByApplication = async (req, res) => {
+  try {
+    const concession = await Concession.findOne({
+      application: req.params.id,
+    });
+
+    if (!concession) {
+      return res.status(404).json({ message: "No concession generated yet" });
+    }
+
+    res.status(200).json(concession);
+  } catch (error) {
+    console.error("GET CONCESSION ERROR:", error);
+    res.status(500).json({ message: "Failed to fetch concession" });
+  }
+};
+
 

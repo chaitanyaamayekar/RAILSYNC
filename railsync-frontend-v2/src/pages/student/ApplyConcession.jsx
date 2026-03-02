@@ -54,7 +54,7 @@ const ApplyConcession = () => {
         // 🔍 DEBUG (remove later)
         console.log("Submitting payload:", payload);
 
-        const res = await API.post("/application", payload);
+        const res = await API.post("/applications", payload);
 
         toast.success("Application created successfully");
 

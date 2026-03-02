@@ -21,7 +21,7 @@ export const uploadSingle = (field) => upload.single(field);
 export const uploadApplicationDocuments = upload.fields([
   { name: "previousPass", maxCount: 1 },
   { name: "idCard", maxCount: 1 },
-  { name: "photo", maxCount: 1 }
+  { name: "addressProof", maxCount: 1 }
 ]);
 
 export const handleUploadError = (err, req, res, next) => {

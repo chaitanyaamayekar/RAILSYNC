@@ -1,182 +1,356 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import API from "../../services/api";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { logout } from "../../store/authSlice";
 import {
-  FaTrain,
-  FaFileAlt,
-  FaClock,
-  FaUserGraduate,
-} from "react-icons/fa";
+  Train,
+  Clock,
+  FileText,
+  CheckCircle,
+  Download,
+  GraduationCap,
+  Mail,
+  Phone,
+  AlertCircle,
+  Calendar,
+} from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.07 },
+  }),
+};
 
 const StudentDashboard = () => {
-  const { user } = useSelector((state) => state.auth);
-
+  const { user, token } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [concession, setConcession] = useState(null);
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [hasApplication, setHasApplication] = useState(true);
 
+  /* ================= FETCH APPLICATION ================= */
   useEffect(() => {
-    const fetchApplication = async () => {
-      try {
-        const res = await API.get("/application/my");
-        setApplication(res.data);
-      } catch (error) {
-        if (error.response?.status === 404) {
-          setHasApplication(false);
-        } else {
-          console.error("Dashboard error:", error);
+  const fetchData = async () => {
+    try {
+      // Fetch application
+      const appRes = await axios.get(
+        "http://localhost:5000/api/applications/my",
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
-    fetchApplication();
-  }, []);
+      setApplication(appRes.data);
+
+      // Fetch concession (only if approved)
+      try {
+        const passRes = await axios.get(
+          "http://localhost:5000/api/concession/my",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setConcession(passRes.data);
+      } catch {
+        setConcession(null);
+      }
+
+    } catch {
+      setApplication(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [token]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/student/login");
+  };
+
+  const hasApplication = !!application;
+
+  /* ================= PROGRESS TRACKER ================= */
+  const steps = ["submitted", "under_review", "approved"];
+  const statusMap = {
+    pending: "submitted",
+    submitted: "submitted",
+    under_review: "under_review",
+    approved: "approved",
+  };
+
+  const rawStatus = application?.status?.toLowerCase()?.trim();
+  const normalizedStatus = statusMap[rawStatus] || "submitted";
+
+  const completedSteps =
+    steps.indexOf(normalizedStatus) >= 0
+      ? steps.indexOf(normalizedStatus) + 1
+      : 0;
+
+  const progress = (completedSteps / steps.length) * 100;
+  //const isApproved = normalizedStatus === "approved";
+  
+  
+  /* ================= DOWNLOAD HANDLER ================= */
+  const handleDownload = async () => {
+  if (!concession?._id) return;
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/concession/download/${concession._id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Download failed");
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Railway_Concession_${concession.passNumber}.pdf`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error("Download error:", err);
+    alert("Failed to download pass");
+  }
+};
+
 
   if (loading) {
-    return <div className="p-8 text-center">Loading dashboard...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading Dashboard...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <FaTrain className="text-3xl text-railway-blue" />
-              <div>
-                <h1 className="text-2xl font-bold text-railway-dark">
-                  Student Dashboard
-                </h1>
-                <p className="text-gray-600">
-                  Welcome back, {user?.name}
-                </p>
-              </div>
+    <div className="min-h-screen bg-slate-50">
+      {/* HEADER */}
+      <header className="bg-gradient-to-r from-blue-900 to-blue-600 text-white sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Train className="h-6 w-6" />
+            <h1 className="font-bold text-lg">RailSync</h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-xs text-white/70 capitalize">
+                {application?.status || "No Application"}
+              </p>
             </div>
 
-            {hasApplication && application && (
-              <div className="text-right">
-                <div className="text-sm text-gray-500">Application ID</div>
-                <div className="font-mono font-bold text-railway-blue">
-                  {application._id}
-                </div>
-              </div>
-            )}
+            <div className="h-9 w-9 rounded-full bg-white/20 flex items-center justify-center font-semibold">
+              {user?.name?.charAt(0)}
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="text-xs bg-red-500 px-3 py-1.5 rounded-lg hover:bg-red-600"
+            >
+              Logout
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* No application yet */}
+      <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        {/* ================= FIRST TIME APPLY ================= */}
         {!hasApplication && (
-          <div className="railway-card text-center">
-            <h2 className="text-xl font-bold mb-4">
-              You haven’t applied yet
+          <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+            <FileText className="h-10 w-10 text-blue-600 mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              No Application Found
             </h2>
-            <p className="text-gray-600 mb-6">
-              Start your railway concession application now.
+            <p className="text-sm text-gray-500 mb-6">
+              You haven’t applied for railway concession yet.
             </p>
-            <Link
-              to="/student/apply"
-              className="railway-btn-primary inline-block"
+
+            <button
+              onClick={() => navigate("/student/apply")}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
             >
               Apply for Concession
-            </Link>
+            </button>
           </div>
         )}
 
-        {/* Application exists */}
-        {hasApplication && application && (
+        {/* ================= DASHBOARD CONTENT ================= */}
+        {hasApplication && (
           <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="railway-card">
-                <div className="flex items-center">
-                  <FaFileAlt className="text-2xl text-railway-blue mr-4" />
-                  <div>
-                    <p className="text-sm text-gray-600">Status</p>
-                    <p className="text-xl font-bold">
-                      {application.status === "approved"
-                        ? "Approved"
-                        : application.status === "rejected"
-                        ? "Rejected"
-                        : "Under Review"}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* QUICK STATS */}
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+            >
+              {[
+                { icon: Clock, label: "Status", value: application?.status },
+                {
+                  icon: Calendar,
+                  label: "Submitted",
+                  value: application?.createdAt
+                    ? new Date(application.createdAt).toLocaleDateString()
+                    : "-",
+                },
+                {
+                  icon: Train,
+                  label: "Route",
+                  value: `${application?.fromStation} → ${application?.toStation}`,
+                },
+                {
+                  icon: FileText,
+                  label: "Documents",
+                  value: (() => {
+                    if (!application?.documents) return 0;
 
-              <div className="railway-card">
-                <div className="flex items-center">
-                  <FaUserGraduate className="text-2xl text-green-600 mr-4" />
-                  <div>
-                    <p className="text-sm text-gray-600">Student</p>
-                    <p className="text-lg font-semibold">
-                      {user?.name}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="railway-card">
-                <div className="flex items-center">
-                  <FaClock className="text-2xl text-purple-600 mr-4" />
-                  <div>
-                    <p className="text-sm text-gray-600">Submitted On</p>
-                    <p className="text-lg font-semibold">
-                      {new Date(application.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="railway-card">
-                <h3 className="text-xl font-bold mb-4">
-                  Application Status
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Track your application progress
-                </p>
-                <Link
-                  to={`/student/status/${application._id}`}
-                  className="railway-btn-secondary w-full text-center"
+                    const docs = Object.values(application.documents);
+                    return docs.filter((doc) => {
+                      if (typeof doc === "object") return doc.url || doc.secure_url;
+                      return typeof doc === "string" && doc.trim() !== "";
+                    }).length;
+                  })(),
+                },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeUp}
+                  custom={i}
+                  className="bg-white p-4 rounded-xl shadow-sm"
                 >
-                  View Status
-                </Link>
+                  <div className="flex items-center gap-3">
+                    <stat.icon className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-xs text-gray-500">{stat.label}</p>
+                      <p className="text-sm font-semibold text-gray-800 truncate capitalize">
+                        {stat.value || "-"}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* LEFT SIDE */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* PROGRESS TRACKER */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                    Application Progress
+                  </h3>
+
+                  <div className="w-full bg-gray-200 h-2 rounded-full mb-6">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    {steps.map((step, index) => {
+                      const done = index < completedSteps;
+                      return (
+                        <div key={index} className="flex items-center gap-3">
+                          <div
+                            className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                              done
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-200 text-gray-600"
+                            }`}
+                          >
+                            {done ? <CheckCircle className="h-4 w-4" /> : index + 1}
+                          </div>
+                          <p className="text-sm capitalize">{step.replace("_", " ")}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              <div className="railway-card">
-                <h3 className="text-xl font-bold mb-4">
-                  Documents
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Upload and manage your documents
-                </p>
-                <Link
-                  to={`/student/upload-documents/${application._id}`}
-                  className="railway-btn-primary w-full text-center"
-                >
-                  Manage Documents
-                </Link>
+              {/* RIGHT SIDE */}
+              <div className="space-y-6">
+                {/* PROFILE CARD */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-900 to-blue-600 text-white p-6 text-center">
+                    <div className="h-16 w-16 bg-white/20 rounded-xl mx-auto flex items-center justify-center text-lg font-bold">
+                      {user?.name?.charAt(0)}
+                    </div>
+                    <p className="mt-2 font-semibold">{user?.name}</p>
+                  </div>
 
-                {/* Re-upload CTA if rejected */}
-                {application.status === "rejected" && (
-                  <p className="text-sm text-red-600 mt-4 text-center">
-                    Your application was rejected. Please re-upload
-                    corrected documents.
-                  </p>
-                )}
+                  <div className="p-6 space-y-3 text-sm">
+                    <div className="flex gap-2">
+                      <GraduationCap className="h-4 w-4 text-gray-500" />
+                      <span>
+                        {application?.course} - Year : {application?.year}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Mail className="h-4 w-4 text-gray-500" />
+                      <span>{user?.email}</span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      <span>{user?.phone}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DOWNLOAD CARD */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+  <h3 className="font-semibold mb-3 flex items-center gap-2">
+    <Download className="h-4 w-4 text-blue-600" />
+    Concession Pass
+  </h3>
+
+  {concession ? (
+    <button
+  onClick={handleDownload}
+  className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
+>
+  Download Official Railway Pass
+</button>
+  ) : (
+    <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs p-3 rounded-lg">
+      <AlertCircle className="h-4 w-4" />
+      Available after approval
+    </div>
+  )}
+</div>
               </div>
             </div>
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 };

@@ -44,24 +44,20 @@ const authSlice = createSlice({
 
     /* ---------- LOGIN SUCCESS ---------- */
     loginSuccess: (state, action) => {
-      const { token, role, user } = action.payload;
+  const data = action.payload;
 
-      state.loading = false;
-      state.token = token;
-      state.role = role;
-      state.user = user || null;
-      state.isAuthenticated = true;
+  state.loading = false;
+  state.token = data.token;
+  state.role = data.role || "student";
+  state.user = data.user;
+  state.isAuthenticated = true;
 
-      // Save safely
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
+  // Save
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("role", state.role);
+  localStorage.setItem("user", JSON.stringify(state.user));
+},
 
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-      } else {
-        localStorage.removeItem("user");
-      }
-    },
 
     /* ---------- LOGOUT ---------- */
     logout: (state) => {

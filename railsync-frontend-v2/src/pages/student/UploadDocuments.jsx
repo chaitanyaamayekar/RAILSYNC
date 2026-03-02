@@ -10,7 +10,7 @@ const UploadDocuments = () => {
   const navigate = useNavigate();
 
   const [documents, setDocuments] = useState({
-    idProof: null,
+    idCard: null,
     addressProof: null,
     previousPass: null,
   });
@@ -28,7 +28,7 @@ const UploadDocuments = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!documents.idProof || !documents.addressProof || !documents.previousPass) {
+    if (!documents.idCard || !documents.addressProof || !documents.previousPass) {
       toast.error("Please upload all required documents");
       return;
     }
@@ -37,19 +37,21 @@ const UploadDocuments = () => {
       setLoading(true);
 
       const formData = new FormData();
-      formData.append("idProof", documents.idProof);
+      formData.append("idCard", documents.idCard);
       formData.append("addressProof", documents.addressProof);
       formData.append("previousPass", documents.previousPass);
 
-      await API.post(
-        `/documents/upload/${applicationId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // await API.post(
+      //   `/documents/upload/${applicationId}`,
+      //   formData,
+      //   {
+      //     headers: {
+      //       "Content-Type": "multipart/form-data",
+      //     },
+      //   }
+      // );
+      await API.post(`/documents/upload/${applicationId}`, formData);
+
 
       toast.success("Documents uploaded successfully!");
       navigate("/student/dashboard");
@@ -63,9 +65,9 @@ const UploadDocuments = () => {
 
   const docList = [
     {
-      key: "idProof",
-      label: "ID Proof",
-      desc: "College ID / Aadhar Card",
+      key: "idCard",
+      label: "ID Card",
+      desc: "College ID",
     },
     {
       key: "addressProof",
@@ -73,7 +75,7 @@ const UploadDocuments = () => {
       desc: "Aadhar Card / Utility Bill",
     },
     {
-      key: "Previous Pass",
+      key: "previousPass",
       label: "Previous Pass",
       desc: "Issued by Railway Department",
     },

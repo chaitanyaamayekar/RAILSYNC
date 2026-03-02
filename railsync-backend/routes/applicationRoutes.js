@@ -12,7 +12,7 @@ router.post(
   createApplication
 );
 
-router.post("/", protect, createApplication);
+//router.post("/", protect, createApplication);
 router.get("/my", protect, getMyApplication);   
 router.get("/:id", protect, getApplicationById);
 

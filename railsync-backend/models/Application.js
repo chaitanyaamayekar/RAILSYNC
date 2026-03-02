@@ -56,8 +56,27 @@ const applicationSchema = new mongoose.Schema(
   type: String,
   enum: ["pending", "approved", "rejected"],
   default: "pending",
-}
-
+ },
+  concessionFormUrl: {
+  type: String,
+},
+   documents: {
+      id_proof: {
+        url: String,
+        publicId: String,
+        verified: { type: Boolean, default: false },
+      },
+      address_proof: {
+        url: String,
+        publicId: String,
+        verified: { type: Boolean, default: false },
+      },
+      previous_pass: {
+        url: String,
+        publicId: String,
+        verified: { type: Boolean, default: false },
+      },
+    }
 
   },
   { timestamps: true }

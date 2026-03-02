@@ -40,7 +40,8 @@ export const registerStudent = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+      
       }
     });
   } catch (error) {
@@ -50,35 +51,81 @@ export const registerStudent = async (req, res) => {
 };
 
 /* ================= LOGIN ================= */
+// export const loginStudent = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user)
+//       return res.status(404).json({ message: "User not found" });
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch)
+//       return res.status(401).json({ message: "Invalid credentials" });
+
+//     const token = jwt.sign(
+//       { id: user._id, role: user.role },
+//       process.env.JWT_SECRET,
+//       { expiresIn: "7d" }
+//     );
+
+//     res.json({
+//       token,
+//       role: user.role,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email
+//       }
+//     });
+//   } catch (error) {
+//     console.error("LOGIN ERROR:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 export const loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "User not found" });
+
+    // USER NOT REGISTERED
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Account not registered. Please sign up first."
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // WRONG PASSWORD
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password"
+      });
+    }
 
-    res.json({
-      token,
-      role: user.role,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
-    });
-  } catch (error) {
-    console.error("LOGIN ERROR:", error);
-    res.status(500).json({ message: error.message });
+    // SUCCESS LOGIN
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+    res.status(200).json({
+    token,
+    role: user.role,
+    user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    college: user.college,
+    year: user.year,
+    studentId: user.studentId,
+    address: user.address,
+  },
+}); 
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    res.status(500).json({ success:false, message:"Server error" });
   }
 };

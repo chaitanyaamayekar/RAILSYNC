@@ -15,7 +15,7 @@ export const uploadDocuments = async (req, res) => {
     const userId = req.user._id;
 
     const typeMap = {
-      idProof: "id_proof",
+      idCard: "id_card",
       addressProof: "address_proof",
       previousPass: "previous_pass",
     };

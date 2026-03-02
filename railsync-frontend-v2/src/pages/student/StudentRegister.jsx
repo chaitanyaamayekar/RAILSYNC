@@ -369,16 +369,17 @@ const StudentRegister = () => {
                 required
               />
               <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
-                I agree to the{' '}
-                <a href="#" className="text-railway-blue hover:underline">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-railway-blue hover:underline">
-                  Privacy Policy
-                </a>
-                . I confirm that all information provided is accurate.
-              </label>
+  I agree to the{" "}
+  <Link to="/terms" className="text-railway-blue hover:underline">
+    Terms of Service
+  </Link>{" "}
+  and{" "}
+  <Link to="/privacy" className="text-railway-blue hover:underline">
+    Privacy Policy
+  </Link>
+  . I confirm that all information provided is accurate.
+</label>
+
             </div>
 
             {/* Submit Button */}

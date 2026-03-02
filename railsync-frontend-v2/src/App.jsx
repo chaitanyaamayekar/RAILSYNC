@@ -16,12 +16,17 @@ import UploadDocuments from "./pages/student/UploadDocuments";
 import ApplicationStatus from "./pages/student/Status";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 function App() {
   return (
+    
     <Routes>
       {/* PUBLIC */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
 
       {/* AUTH */}
       <Route path="/admin/login" element={<AdminLogin />} />
@@ -88,6 +93,7 @@ function App() {
         }
       />
     </Routes>
+    
   );
 }
 
