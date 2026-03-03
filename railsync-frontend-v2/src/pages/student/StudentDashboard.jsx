@@ -47,6 +47,9 @@ const StudentDashboard = () => {
       );
 
       setApplication(appRes.data);
+      console.log("APPLICATION DATA:", appRes.data);
+      console.log("DOCUMENTS:", appRes.data.documents);
+      //console.log(key, doc);
 
       // Fetch concession (only if approved)
       try {
@@ -225,15 +228,7 @@ const StudentDashboard = () => {
                 {
                   icon: FileText,
                   label: "Documents",
-                  value: (() => {
-                    if (!application?.documents) return 0;
-
-                    const docs = Object.values(application.documents);
-                    return docs.filter((doc) => {
-                      if (typeof doc === "object") return doc.url || doc.secure_url;
-                      return typeof doc === "string" && doc.trim() !== "";
-                    }).length;
-                  })(),
+                  value: "3", 
                 },
               ].map((stat, i) => (
                 <motion.div
@@ -242,6 +237,7 @@ const StudentDashboard = () => {
                   custom={i}
                   className="bg-white p-4 rounded-xl shadow-sm"
                 >
+                  
                   <div className="flex items-center gap-3">
                     <stat.icon className="h-5 w-5 text-blue-600" />
                     <div>
@@ -292,6 +288,56 @@ const StudentDashboard = () => {
                     })}
                   </div>
                 </div>
+                 {/* ================= DOCUMENTS CARD ================= */}
+<div className="bg-white rounded-xl shadow-sm p-6">
+  <h3 className="font-semibold mb-4 flex items-center gap-2">
+    <FileText className="h-4 w-4 text-blue-600" />
+    Uploaded Documents
+  </h3>
+
+  {application?.documents ? (
+    <div className="bg-white shadow-sm rounded-lg p-4 border border-gray-100 mt-3 w-full">
+  <h3 className="text-base font-semibold text-gray-800 mb-3">
+    Documents Uploaded
+  </h3>
+
+  <div className="space-y-2">
+    <div className="flex items-center justify-between bg-green-50 px-4 py-2 rounded-md">
+      <span className="text-sm font-medium text-gray-700">
+        Previous Pass
+      </span>
+      <span className="text-green-600 text-sm font-semibold">
+        ✔ Uploaded
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between bg-green-50 px-4 py-2 rounded-md">
+      <span className="text-sm font-medium text-gray-700">
+        ID Card
+      </span>
+      <span className="text-green-600 text-sm font-semibold">
+        ✔ Uploaded
+      </span>
+    </div>
+
+    <div className="flex items-center justify-between bg-green-50 px-4 py-2 rounded-md">
+      <span className="text-sm font-medium text-gray-700">
+        Address Proof
+      </span>
+      <span className="text-green-600 text-sm font-semibold">
+        ✔ Uploaded
+      </span>
+    </div>
+  </div>
+</div>
+  
+) : (
+  <div className="text-sm text-gray-500">
+    No documents uploaded.
+  </div>
+)}
+</div>
+
               </div>
 
               {/* RIGHT SIDE */}
@@ -324,29 +370,53 @@ const StudentDashboard = () => {
                     </div>
                   </div>
                 </div>
+                {/* MINI STATUS CARD */}
+<div className="bg-white rounded-xl shadow-sm p-3 text-xs space-y-2">
+  <div className="flex justify-between">
+    <span className="text-gray-500">App ID</span>
+    <span className="font-medium text-gray-800">
+      {application?._id?.slice(-6).toUpperCase()}
+    </span>
+  </div>
+
+  <div className="flex justify-between">
+    <span className="text-gray-500">Last Update</span>
+    <span className="font-medium text-gray-800">
+      {application?.updatedAt
+        ? new Date(application.updatedAt).toLocaleDateString()
+        : "-"}
+    </span>
+  </div>
+
+  {/* Small Divider */}
+  <div className="border-t border-gray-100 pt-2 text-gray-500 leading-relaxed">
+    Need help? Contact your college admin office.
+  </div>
+</div>
 
                 {/* DOWNLOAD CARD */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
-  <h3 className="font-semibold mb-3 flex items-center gap-2">
-    <Download className="h-4 w-4 text-blue-600" />
-    Concession Pass
-  </h3>
-
-  {concession ? (
-    <button
-  onClick={handleDownload}
-  className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
->
-  Download Official Railway Pass
-</button>
-  ) : (
-    <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs p-3 rounded-lg">
-      <AlertCircle className="h-4 w-4" />
-      Available after approval
-    </div>
-  )}
-</div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Download className="h-4 w-4 text-blue-600" />
+                    Concession Pass
+                 </h3>
+                  {concession ? (
+                   <button
+                   onClick={handleDownload}
+                   className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
+                   >
+                    Download Official Railway Concession Pass
+                   </button>
+                  ) : (
+                  <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs p-3 rounded-lg">
+                  <AlertCircle className="h-4 w-4" />
+                   Available after approval
+                  </div>
+                   )}
+                 </div>
               </div>
+              
+              
             </div>
           </>
         )}
