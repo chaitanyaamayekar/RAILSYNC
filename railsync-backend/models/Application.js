@@ -53,14 +53,30 @@ const applicationSchema = new mongoose.Schema(
     },
 
    status: {
-  type: String,
-  enum: ["pending", "approved", "rejected"],
-  default: "pending",
+     type: String,
+     enum: ["pending", "approved", "rejected"],
+     default: "pending",
  },
-  concessionFormUrl: {
-  type: String,
+   concessionFormUrl: {
+     type: String,
 },
-   documents: {
+    rejectionReason: {
+     type: String,
+     default: "",
+},
+    formGeneratedAt: {
+     type: Date,
+},
+
+    formExpiresAt: {
+     type: Date,
+},
+
+    regenerateCount: {
+     type: Number,
+    default: 0,
+},
+    documents: {
       id_proof: {
         url: String,
         publicId: String,

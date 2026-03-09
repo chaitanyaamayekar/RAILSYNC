@@ -19,7 +19,11 @@ const STATUS_BADGE = {
 };
 
 const AdminDashboard = () => {
-  const { token } = useSelector((state) => state.auth);
+  const { token, role } = useSelector((state) => state.auth);
+
+  if (!token || role !== "admin") {
+   return <Navigate to="/admin/login" />;
+  }
 
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
   const [recentApplications, setRecentApplications] = useState([]);
@@ -63,7 +67,7 @@ const AdminDashboard = () => {
               <p className="text-gray-600">Railway Concession Management</p>
             </div>
           </div>
-          <div className="text-sm text-gray-600">Railway Department</div>
+          <div className="text-sm text-gray-600">RailSync</div>
         </div>
       </div>
 

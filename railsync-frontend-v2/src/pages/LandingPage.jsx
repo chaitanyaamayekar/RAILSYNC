@@ -1,17 +1,17 @@
 // import React from "react";
-// import { Link } from "react-router-dom";
-// import { useSelector } from "react-redux";
-// import { useDispatch } from "react-redux";
-// import { useNavigate } from "react-router-dom";
+// import { Link, useNavigate } from "react-router-dom";
+// import { useSelector, useDispatch } from "react-redux";
 // import { logout } from "../store/authSlice";
-// import { FaSignOutAlt } from "react-icons/fa";
 
 // import {
 //   FaTrain,
 //   FaUserGraduate,
-//   FaUserShield,
 //   FaArrowRight,
-//   FaUserCircle
+//   FaUserCircle,
+//   FaSignOutAlt,
+//   FaFileAlt,
+//   FaClock,
+//   FaCheckCircle,
 // } from "react-icons/fa";
 
 // const LandingPage = () => {
@@ -25,82 +25,157 @@
 //   };
 
 //   return (
-//     <div className="min-h-screen bg-gradient-to-br from-railway-blue/5 to-white">
-//       {/* TOP BAR */}
-//       <div className="w-full bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-//         <div className="flex items-center space-x-2">
-//           <FaTrain className="text-railway-blue text-xl" />
-//           <span className="font-bold text-railway-blue text-lg">
-//             RAILSYNC
-//           </span>
+//     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-100">
+
+//       {/* ================= NAVBAR ================= */}
+//       <header className="bg-white/80 backdrop-blur border-b">
+//         <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+
+//           <div className="flex items-center gap-3">
+//             <FaTrain className="text-blue-600 text-2xl" />
+//             <span className="text-xl font-bold">RailSync</span>
+//           </div>
+
+//           {user ? (
+//             <div className="flex items-center gap-5">
+//               <FaUserCircle className="text-2xl text-gray-600" />
+//               <span>{user.name}</span>
+
+//               <button
+//                 onClick={() => navigate("/student/dashboard")}
+//                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+//               >
+//                 Dashboard
+//               </button>
+
+//               <button
+//                 onClick={handleLogout}
+//                 className="text-red-600 hover:text-red-700"
+//               >
+//                 <FaSignOutAlt />
+//               </button>
+//             </div>
+//           ) : (
+//             <div className="flex gap-6 items-center">
+//               <Link
+//                 to="/student/login"
+//                 className="hover:text-blue-600"
+//               >
+//                 Login
+//               </Link>
+
+//               <Link
+//                 to="/student/register"
+//                 className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+//               >
+//                 Get Started
+//               </Link>
+//             </div>
+//           )}
 //         </div>
+//       </header>
 
-//         {user ? (
-//           <div className="flex items-center space-x-3">
-//             <FaUserCircle className="text-2xl text-gray-600" />
-//             <span className="font-medium text-gray-700">
-//               Welcome, <span className="text-railway-blue">{user.name}</span>
-//             </span>
-//             <button
-//   onClick={handleLogout}
-//   className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-// >
-//   <FaSignOutAlt />
-//   <span>Logout</span>
-// </button>
+//       {/* ================= HERO ================= */}
+//       <main className="flex-1 flex items-center">
+//         <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-12 items-center">
 
+//           {/* LEFT SIDE */}
+//           <div>
+//             <h1 className="text-5xl font-extrabold leading-tight">
+//               Railway Concession <br />
+//               <span className="text-blue-600">Made Simple</span>
+//             </h1>
+
+//             <p className="mt-6 text-gray-600">
+//               RailSync helps students apply, track, and download
+//               railway concession certificates digitally without
+//               standing in long queues.
+//             </p>
+
+//             {!user && (
+//               <div className="mt-8 flex gap-4">
+//                 <Link
+//                   to="/student/register"
+//                   className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow"
+//                 >
+//                   <FaUserGraduate />
+//                   Apply Now
+//                   <FaArrowRight />
+//                 </Link>
+
+//                 <Link
+//                   to="/student/login"
+//                   className="px-6 py-3 border rounded-xl hover:bg-gray-100"
+//                 >
+//                   Track Status
+//                 </Link>
+//               </div>
+//             )}
+
+//             {/* RAILWAY TRACK */}
+//             <div className="mt-10 flex items-center gap-3">
+//               <div className="h-1 w-16 bg-gray-400"></div>
+//               <FaTrain className="text-gray-500" />
+//               <div className="h-1 w-16 bg-gray-400"></div>
+//             </div>
 //           </div>
-          
-//         ) : (
-//           <div className="space-x-4">
-//             <Link
-//               to="/student/login"
-//               className="text-railway-blue font-medium"
-//             >
-//               Login
-//             </Link>
-//             <Link
-//               to="/student/register"
-//               className="railway-btn-primary px-4 py-2"
-//             >
-//               Register
-//             </Link>
-//           </div>
-//         )}
-//       </div>
 
-//       {/* MAIN CONTENT */}
-//       <div className="relative container mx-auto px-4 pt-12">
-//         <div className="max-w-4xl mx-auto text-center pt-16">
-//           <h1 className="text-5xl font-bold mb-6">RAILSYNC.</h1>
-//           <p className="text-xl text-gray-600 mb-12">
-//             Apply for railway concessions online with real-time tracking.
+//           {/* RIGHT SIDE IMAGE */}
+//           <div className="flex justify-center">
+//             <img
+//               src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png"
+//               alt="train travel"
+//               className="h-80 object-contain"
+//             />
+//           </div>
+//         </div>
+//       </main>
+
+//       {/* ================= FEATURES ================= */}
+//       <section className="max-w-7xl mx-auto px-8 pb-12 grid md:grid-cols-3 gap-6">
+
+//         <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+//           <FaFileAlt className="text-blue-600 text-3xl mb-4" />
+//           <h3 className="font-semibold text-lg mb-2">
+//             Apply Online
+//           </h3>
+//           <p className="text-sm text-gray-600">
+//             Submit your railway concession form digitally.
 //           </p>
-
-//           <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-//             <Link to="/student/login" className="railway-card group">
-//               <FaUserGraduate className="text-4xl text-railway-blue mb-4" />
-//               <h3 className="text-xl font-bold">Student Portal</h3>
-//               <span className="flex items-center mt-3 text-railway-blue">
-//                 Enter <FaArrowRight className="ml-2" />
-//               </span>
-//             </Link>
-
-//             <Link to="/admin/login" className="railway-card group">
-//               <FaUserShield className="text-4xl text-railway-green mb-4" />
-//               <h3 className="text-xl font-bold">Admin Portal</h3>
-//               <span className="flex items-center mt-3 text-railway-green">
-//                 Enter <FaArrowRight className="ml-2" />
-//               </span>
-//             </Link>
-//           </div>
 //         </div>
-//       </div>
+
+//         <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+//           <FaClock className="text-indigo-600 text-3xl mb-4" />
+//           <h3 className="font-semibold text-lg mb-2">
+//             Track Status
+//           </h3>
+//           <p className="text-sm text-gray-600">
+//             Monitor application approval in real-time.
+//           </p>
+//         </div>
+
+//         <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+//           <FaCheckCircle className="text-green-600 text-3xl mb-4" />
+//           <h3 className="font-semibold text-lg mb-2">
+//             Download Pass
+//           </h3>
+//           <p className="text-sm text-gray-600">
+//             Instantly download approved concession certificates.
+//           </p>
+//         </div>
+
+//       </section>
+
+//       {/* ================= FOOTER ================= */}
+//       <footer className="text-center text-gray-500 pb-4 text-sm">
+//         © {new Date().getFullYear()} RailSync
+//       </footer>
 //     </div>
 //   );
 // };
 
 // export default LandingPage;
+
 
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -129,34 +204,32 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 text-gray-800">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-100">
 
       {/* ================= NAVBAR ================= */}
-      <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+      <header className="bg-white/80 backdrop-blur border-b">
         <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
-          
+
           <div className="flex items-center gap-3">
-            <FaTrain className="text-blue-600 text-xl" />
-            <span className="text-xl font-bold tracking-wide">
-              RAILSYNC
-            </span>
+            <FaTrain className="text-blue-600 text-2xl" />
+            <span className="text-xl font-bold">RailSync</span>
           </div>
 
           {user ? (
             <div className="flex items-center gap-5">
               <FaUserCircle className="text-2xl text-gray-600" />
-              <span className="font-medium">{user.name}</span>
+              <span>{user.name}</span>
 
               <button
                 onClick={() => navigate("/student/dashboard")}
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Dashboard
               </button>
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 transition"
+                className="text-red-600 hover:text-red-700"
               >
                 <FaSignOutAlt />
               </button>
@@ -165,13 +238,14 @@ const LandingPage = () => {
             <div className="flex gap-6 items-center">
               <Link
                 to="/student/login"
-                className="font-medium text-gray-700 hover:text-blue-600 transition"
+                className="hover:text-blue-600"
               >
                 Login
               </Link>
+
               <Link
                 to="/student/register"
-                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow-md hover:scale-105 transition"
+                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Get Started
               </Link>
@@ -181,131 +255,113 @@ const LandingPage = () => {
       </header>
 
       {/* ================= HERO ================= */}
-      <section className="pt-40 pb-20 px-6 text-center max-w-6xl mx-auto">
+      <main className="flex-1 flex items-center">
+        <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-12 items-center">
 
-        <h1 className="text-6xl md:text-7xl font-extrabold leading-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Smarter Railway <br /> Concession System
-        </h1>
-
-        <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-          Designed for students traveling daily on Mumbai local trains.
-          Apply, track, and download your concession digitally.
-        </p>
-
-        {!user && (
-          <div className="mt-10 flex justify-center gap-6 flex-wrap">
-            <Link
-              to="/student/register"
-              className="px-8 py-4 bg-blue-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition flex items-center gap-3"
-            >
-              <FaUserGraduate />
-              Start Application
-              <FaArrowRight />
-            </Link>
-
-            <Link
-              to="/student/login"
-              className="px-8 py-4 border border-gray-300 rounded-xl hover:bg-gray-100 transition"
-            >
-              Track Status
-            </Link>
-          </div>
-        )}
-
-        {/* Train Divider Line */}
-        <div className="mt-20 border-t-4 border-dashed border-gray-300 w-3/4 mx-auto"></div>
-      </section>
-
-      {/* ================= STUDENT SECTION ================= */}
-      <section className="bg-white py-20 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-
+          {/* LEFT SIDE */}
           <div>
-            <h2 className="text-3xl font-bold mb-4">
-              Built for Daily Student Commuters
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Thousands of students commute daily across Mumbai using
-              local trains. RailSync simplifies the concession process —
-              no long queues, no paperwork, and faster approvals.
+            <h1 className="text-5xl font-extrabold leading-tight">
+              Railway Concession <br />
+              <span className="text-blue-600">Made Simple</span>
+            </h1>
+
+            <p className="mt-6 text-gray-600">
+              RailSync helps students apply, track, and download
+              railway concession certificates digitally without
+              standing in long queues.
             </p>
 
-            <ul className="space-y-3 text-gray-600">
-              <li className="flex items-center gap-3">
-                <FaCheckCircle className="text-green-600" />
-                College verified applications
-              </li>
-              <li className="flex items-center gap-3">
-                <FaCheckCircle className="text-green-600" />
-                Digital concession certificate
-              </li>
-              <li className="flex items-center gap-3">
-                <FaCheckCircle className="text-green-600" />
-                Real-time approval tracking
-              </li>
-            </ul>
+            {!user && (
+              <div className="mt-8 flex gap-4">
+                <Link
+                  to="/student/register"
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow"
+                >
+                  <FaUserGraduate />
+                  Apply Now
+                  <FaArrowRight />
+                </Link>
+
+                <Link
+                  to="/student/login"
+                  className="px-6 py-3 border rounded-xl hover:bg-gray-100"
+                >
+                  Track Status
+                </Link>
+              </div>
+            )}
+
+            {/* RAILWAY TRACK */}
+            <div className="mt-10 flex items-center gap-3">
+              <div className="h-1 w-16 bg-gray-400"></div>
+              <FaTrain className="text-gray-500" />
+              <div className="h-1 w-16 bg-gray-400"></div>
+            </div>
           </div>
 
+          {/* RIGHT SIDE IMAGE */}
           <div className="flex justify-center">
             <img
-              src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png"
-              alt="Student"
-              className="h-72 object-contain"
+              src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png"
+              alt="train travel"
+              className="h-80 object-contain"
             />
           </div>
-
         </div>
-      </section>
+      </main>
 
-      {/* ================= PROCESS SECTION ================= */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-12 text-center">
+      {/* ================= FEATURES ================= */}
+      <section className="max-w-7xl mx-auto px-8 pb-12 grid md:grid-cols-3 gap-6">
 
-          <div className="hover:-translate-y-2 transition duration-300">
-            <FaFileAlt className="text-blue-600 text-4xl mx-auto mb-5" />
-            <h3 className="text-xl font-semibold mb-3">
-              Submit Application
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Fill out the online concession form and submit instantly.
-            </p>
-          </div>
-
-          <div className="hover:-translate-y-2 transition duration-300">
-            <FaClock className="text-indigo-600 text-4xl mx-auto mb-5" />
-            <h3 className="text-xl font-semibold mb-3">
-              Under Review
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Admin verifies your details and processes your request.
-            </p>
-          </div>
-
-          <div className="hover:-translate-y-2 transition duration-300">
-            <FaCheckCircle className="text-green-600 text-4xl mx-auto mb-5" />
-            <h3 className="text-xl font-semibold mb-3">
-              Download Certificate
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Access and download your approved concession certificate.
-            </p>
-          </div>
-
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <FaFileAlt className="text-blue-600 text-3xl mb-4" />
+          <h3 className="font-semibold text-lg mb-2">
+            Apply Online
+          </h3>
+          <p className="text-sm text-gray-600">
+            Submit your railway concession form digitally.
+          </p>
         </div>
+
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <FaClock className="text-indigo-600 text-3xl mb-4" />
+          <h3 className="font-semibold text-lg mb-2">
+            Track Status
+          </h3>
+          <p className="text-sm text-gray-600">
+            Monitor application approval in real-time.
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <FaCheckCircle className="text-green-600 text-3xl mb-4" />
+          <h3 className="font-semibold text-lg mb-2">
+            Download Pass
+          </h3>
+          <p className="text-sm text-gray-600">
+            Instantly download approved concession certificates.
+          </p>
+        </div>
+
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="bg-gray-900 text-gray-400 text-center py-8">
-        <p className="text-white font-semibold mb-2">RAILSYNC</p>
-        <p>Railway Concession Management System</p>
-        <p className="text-sm mt-3">
-          © {new Date().getFullYear()} All Rights Reserved
-        </p>
+      <footer className="text-center text-gray-500 pb-4 text-sm">
+        © {new Date().getFullYear()} RailSync
+
+        <div className="mt-1">
+          <Link
+            to="/admin/login"
+            className="text-xs text-gray-400 hover:text-gray-600"
+          >
+            Admin Login
+          </Link>
+        </div>
       </footer>
 
-      {/* Admin login hidden but route still works at /admin/login */}
     </div>
   );
 };
 
 export default LandingPage;
+

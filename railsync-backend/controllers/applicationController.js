@@ -115,7 +115,9 @@ export const getMyApplication = async (req, res) => {
   try {
     const application = await Application.findOne({
       student: req.user._id,
-    }).populate("student", "name email phone college studentId year");
+    })
+      .sort({ createdAt: -1 }) // gets latest application
+      .populate("student", "name email phone college studentId year address");
 
     if (!application) {
       return res.status(404).json({ message: "No application found" });
@@ -134,7 +136,7 @@ export const getMyApplication = async (req, res) => {
 export const getApplicationById = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id)
-      .populate("student", "name email");
+      .populate("student", "name email phone college studentId year address");
 
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
@@ -149,25 +151,6 @@ export const getApplicationById = async (req, res) => {
 /* =========================================
    APPROVE APPLICATION
 ========================================= */
-// export const approveApplication = async (req, res) => {
-//   try {
-//     const application = await Application.findById(req.params.id);
-
-//     if (!application)
-//       return res.status(404).json({ message: "Application not found" });
-
-//     if (application.status !== "pending")
-//      return res.status(400).json({ message: "Already processed" });
-
-//     application.status = "approved";
-//     await application.save();
-
-//     res.json(application);
-//   } catch (err) {
-//     console.error("APPROVE ERROR:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
    export const approveApplication = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id);
@@ -213,6 +196,47 @@ export const rejectApplication = async (req, res) => {
     res.json(application);
   } catch (err) {
     console.error("REJECT ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+/* =========================================
+   REGENERATE CONCESSION FORM
+========================================= */
+export const regenerateForm = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.id);
+
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
+
+    if (application.student.toString() !== req.user._id.toString())
+      return res.status(403).json({ message: "Unauthorized" });
+
+    if (application.status !== "approved")
+      return res.status(400).json({ message: "Application not approved" });
+
+    if (application.regenerateCount >= 2) {
+      return res.status(400).json({
+        message: "Regeneration limit reached. Please apply again.",
+      });
+    }
+
+    const today = new Date();
+    const expiry = new Date();
+    expiry.setDate(today.getDate() + 3);
+
+    application.formGeneratedAt = today;
+    application.formExpiresAt = expiry;
+    application.regenerateCount += 1;
+
+    await application.save();
+
+    res.json({
+      message: "Form regenerated successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("REGENERATE FORM ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

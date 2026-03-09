@@ -50,39 +50,7 @@ export const registerStudent = async (req, res) => {
   }
 };
 
-/* ================= LOGIN ================= */
-// export const loginStudent = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
 
-//     const user = await User.findOne({ email });
-//     if (!user)
-//       return res.status(404).json({ message: "User not found" });
-
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch)
-//       return res.status(401).json({ message: "Invalid credentials" });
-
-//     const token = jwt.sign(
-//       { id: user._id, role: user.role },
-//       process.env.JWT_SECRET,
-//       { expiresIn: "7d" }
-//     );
-
-//     res.json({
-//       token,
-//       role: user.role,
-//       user: {
-//         id: user._id,
-//         name: user.name,
-//         email: user.email
-//       }
-//     });
-//   } catch (error) {
-//     console.error("LOGIN ERROR:", error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 export const loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -108,7 +76,7 @@ export const loginStudent = async (req, res) => {
     }
 
     // SUCCESS LOGIN
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     res.status(200).json({
     token,

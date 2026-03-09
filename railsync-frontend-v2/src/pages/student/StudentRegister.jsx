@@ -96,7 +96,7 @@ const StudentRegister = () => {
     'Other'
   ]
 
-  const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year', 'Fifth Year']
+  const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year']
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-railway-blue/5 to-white py-8">

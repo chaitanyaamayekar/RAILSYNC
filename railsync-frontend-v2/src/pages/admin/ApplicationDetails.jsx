@@ -231,6 +231,8 @@ const ApplicationDetails = () => {
   const [concession, setConcession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   /* ================= FETCH DATA ================= */
   useEffect(() => {
@@ -278,38 +280,33 @@ const ApplicationDetails = () => {
 
   /* ================= APPROVE / REJECT ================= */
   const updateStatus = async (status) => {
-    try {
-      setActionLoading(true);
+  try {
+    setActionLoading(true);
 
-      const { data } = await axios.put(
-        `http://localhost:5000/api/admin/${status}/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    const body =
+      status === "reject"
+        ? { reason: rejectReason }
+        : {};
 
-      // instant UI update
-      setApplication(data);
+    const { data } = await axios.put(
+      `http://localhost:5000/api/admin/${status}/${id}`,
+      body,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      // if approved → fetch concession immediately
-      if (status === "approve") {
-        try {
-          const consRes = await axios.get(
-            `http://localhost:5000/api/admin/concession/${id}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          setConcession(consRes.data);
-        } catch {
-          setConcession(null);
-        }
-      }
+    setApplication(data);
 
-      toast.success(`Application ${status}d`);
-    } catch (err) {
-      toast.error("Action failed");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+    toast.success(`Application ${status}ed`);
+
+    setShowRejectModal(false);
+    setRejectReason("");
+
+  } catch (err) {
+    toast.error("Action failed");
+  } finally {
+    setActionLoading(false);
+  }
+};
 
   /* ================= DOCUMENT RENDER ================= */
   const renderDocument = (type, label) => {
@@ -436,12 +433,55 @@ const ApplicationDetails = () => {
             </button>
 
             <button
-              disabled={actionLoading}
-              onClick={() => updateStatus("reject")}
-              className="px-6 py-3 bg-red-600 text-white rounded-lg flex items-center gap-2"
-            >
-              <FaTimes /> Reject
-            </button>
+  onClick={() => setShowRejectModal(true)}
+  className="px-6 py-3 bg-red-600 text-white rounded-lg flex items-center gap-2"
+>
+  <FaTimes /> Reject
+</button>
+          {showRejectModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+    <div className="bg-white rounded-xl shadow-xl w-[400px] p-6">
+
+      <h2 className="text-xl font-bold mb-4 text-red-600">
+        Reject Application
+      </h2>
+
+      <p className="text-sm text-gray-600 mb-3">
+        Please enter reason for rejection
+      </p>
+
+      <textarea
+        value={rejectReason}
+        onChange={(e) => setRejectReason(e.target.value)}
+        rows="4"
+        className="w-full border rounded-lg p-3 mb-4"
+        placeholder="Example: ID card not visible or documents missing"
+      />
+
+      <div className="flex justify-end gap-3">
+
+        <button
+          onClick={() => setShowRejectModal(false)}
+          className="px-4 py-2 bg-gray-200 rounded-lg"
+        >
+          Cancel
+        </button>
+
+        <button
+          disabled={!rejectReason || actionLoading}
+          onClick={() => updateStatus("reject")}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg"
+        >
+          Reject Application
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
           </div>
         )}
 

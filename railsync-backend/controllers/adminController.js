@@ -62,8 +62,18 @@ export const getAllApplications = async (req, res) => {
     if (application.status !== "pending")
       return res.status(400).json({ message: "Already processed" });
 
-    application.status = "approved";
-    await application.save();
+     application.status = "approved";
+
+/* FORM VALIDITY SYSTEM */
+const today = new Date();
+const expiry = new Date();
+expiry.setDate(today.getDate() + 3);
+
+application.formGeneratedAt = today;
+application.formExpiresAt = expiry;
+application.regenerateCount = 0;
+
+await application.save();
 
     /* CREATE CONCESSION RECORD */
     const existingConcession = await Concession.findOne({
@@ -119,19 +129,32 @@ const concession = await Concession.create({
  */
 export const rejectApplication = async (req, res) => {
   try {
-    const application = await Application.findByIdAndUpdate(
-      req.params.id,
-      { status: "rejected" },
-      { new: true }
-    ).populate("student", "name email phone college studentId year");
+    const { reason } = req.body;
+
+    const application = await Application.findById(req.params.id);
 
     if (!application)
       return res.status(404).json({ message: "Application not found" });
 
-    res.status(200).json(application); // ⚠️ SAME HERE
-  } catch (error) {
-    console.error("REJECT ERROR:", error);
-    res.status(500).json({ message: "Rejection failed" });
+    if (application.status !== "pending")
+      return res.status(400).json({ message: "Already processed" });
+
+    if (!reason || reason.trim() === "") {
+      return res.status(400).json({ message: "Rejection reason required" });
+    }
+
+    application.status = "rejected";
+    application.rejectionReason = reason;
+
+    await application.save();
+
+    res.json({
+      message: "Application rejected",
+      application,
+    });
+  } catch (err) {
+    console.error("REJECT ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

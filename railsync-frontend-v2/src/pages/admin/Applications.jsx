@@ -66,7 +66,22 @@ const Applications = () => {
           ? `http://localhost:5000/api/admin/approve/${id}`
           : `http://localhost:5000/api/admin/reject/${id}`
 
-      await axios.put(url, {}, { headers: { Authorization: `Bearer ${token}` } })
+        let body = {}
+
+if (status === "rejected") {
+  const reason = prompt("Enter rejection reason")
+
+  if (!reason) {
+    toast.error("Rejection reason required")
+    return
+  }
+
+  body = { reason }
+}
+
+await axios.put(url, body, {
+  headers: { Authorization: `Bearer ${token}` }
+})
 
       // update UI using lowercase (same as DB)
       setApplications((prev) =>
