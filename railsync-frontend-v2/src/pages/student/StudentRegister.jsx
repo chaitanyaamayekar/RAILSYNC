@@ -36,16 +36,7 @@ const StudentRegister = () => {
       address: '',
     },
     validationSchema,
-    // onSubmit: async (values) => {
-    //   setLoading(true)
-    //   // Simulate API call
-    //   setTimeout(() => {
-    //     toast.success('Registration successful! Please login.')
-    //     navigate('/student/login')
-    //     setLoading(false)
-    //   }, 1500)
-    // },
-   onSubmit: async (values) => {
+      onSubmit: async (values) => {
   setLoading(true);
 
   try {
@@ -70,7 +61,7 @@ const StudentRegister = () => {
       throw new Error(data.message || "Registration failed");
     }
 
-    toast.success("Registration successful! Please login.");
+    toast.success("Registered! Please check your email to verify.");
     navigate("/student/login");
 
   } catch (error) {
@@ -93,7 +84,7 @@ const StudentRegister = () => {
     'KJ Somaiya College of Engineering',
     'Veermata Jijabai Technological Institute',
     'Indian Institute of Technology Bombay',
-    'Other'
+    'Mulund College of Commerce'
   ]
 
   const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year']
@@ -155,7 +146,7 @@ const StudentRegister = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       className="railway-input pl-10"
-                      placeholder="John Doe"
+                      placeholder="Enter your full name"
                     />
                   </div>
                   {formik.touched.fullName && formik.errors.fullName && (

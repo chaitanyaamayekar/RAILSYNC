@@ -277,6 +277,7 @@ const ApplyConcession = () => {
       college: "",
       year: "",
       course: "",
+      firstTimeApplicant: false
     },
 
     validationSchema: schema,
@@ -292,6 +293,7 @@ const ApplyConcession = () => {
           course: values.course,
           concessionType: "Monthly",
           duration: "monthly",
+          firstTimeApplicant: values.firstTimeApplicant
         };
 
         const res = await API.post("/applications", payload);
@@ -500,7 +502,37 @@ const ApplyConcession = () => {
               </div>
 
             </div>
+            <div>
+             <h2 className="text-lg font-semibold mb-4">
+             Previous Concession
+             </h2>
 
+             <div className="flex gap-6">
+
+             <label className="flex items-center gap-2">
+              <input
+              type="radio"
+              name="firstTimeApplicant"
+              value="false"
+              checked={formik.values.firstTimeApplicant === false}
+              onChange={() => formik.setFieldValue("firstTimeApplicant", false)}
+              />
+             Renewal (I had a pass before)
+             </label>
+
+             <label className="flex items-center gap-2">
+             <input
+             type="radio"
+              name="firstTimeApplicant"
+              value="true"
+              checked={formik.values.firstTimeApplicant === true}
+              onChange={() => formik.setFieldValue("firstTimeApplicant", true)}
+             />
+             First Time Applicant
+             </label>
+ 
+             </div>
+            </div>
             {/* SUBMIT */}
             <div className="flex justify-end">
 

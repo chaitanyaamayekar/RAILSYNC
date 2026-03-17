@@ -28,7 +28,7 @@ const UploadDocuments = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!documents.idCard || !documents.addressProof || !documents.previousPass) {
+    if (!documents.idCard || !documents.addressProof ) {
       toast.error("Please upload all required documents");
       return;
     }
@@ -39,7 +39,10 @@ const UploadDocuments = () => {
       const formData = new FormData();
       formData.append("idCard", documents.idCard);
       formData.append("addressProof", documents.addressProof);
-      formData.append("previousPass", documents.previousPass);
+      //formData.append("previousPass", documents.previousPass);
+      if (documents.previousPass) {
+       formData.append("previousPass", documents.previousPass);
+      }
 
       // await API.post(
       //   `/documents/upload/${applicationId}`,
@@ -76,7 +79,7 @@ const UploadDocuments = () => {
     },
     {
       key: "previousPass",
-      label: "Previous Pass",
+      label: "Previous Pass   *[Optional only if first time applicant]*",
       desc: "Issued by Railway Department",
     },
   ];

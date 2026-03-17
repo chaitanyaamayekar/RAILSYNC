@@ -70,10 +70,24 @@ export const uploadDocuments = async (req, res) => {
     if (application.student.toString() !== req.user._id.toString())
       return res.status(403).json({ message: "Unauthorized" });
 
-    if (!req.files?.pass || !req.files?.idCard || !req.files?.photo)
+    if (!req.files?.idCard || !req.files?.photo)
       return res.status(400).json({ message: "All documents required" });
 
-    const passUpload = await uploadToCloudinary(req.files.pass[0].buffer, "railway_concession");
+    //const passUpload = await uploadToCloudinary(req.files.pass[0].buffer, "railway_concession");
+    let passUpload = null;
+
+if (req.files?.pass) {
+  passUpload = await uploadToCloudinary(
+    req.files.pass[0].buffer,
+    "railway_concession"
+  );
+
+  application.documents.previous_pass = {
+    url: passUpload.secure_url,
+    publicId: passUpload.public_id,
+    verified: false,
+  };
+}
     const idUpload = await uploadToCloudinary(req.files.idCard[0].buffer, "railway_concession");
     const photoUpload = await uploadToCloudinary(req.files.photo[0].buffer, "railway_concession");
 
@@ -161,10 +175,10 @@ export const getApplicationById = async (req, res) => {
     if (application.status !== "pending")
       return res.status(400).json({ message: "Already processed" });
 
-    // 🔥 1. Change status
+    // 1. Change status
     application.status = "approved";
 
-    // 🔥 2. Generate concession form (for now dummy URL)
+    // 2. Generate concession form (for now dummy URL)
     application.concessionFormUrl =
       "https://example.com/concession-form.pdf";
 

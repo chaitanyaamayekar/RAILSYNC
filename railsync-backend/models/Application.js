@@ -39,6 +39,11 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    
+    firstTimeApplicant: {
+     type: Boolean,
+    default: false
+    },
 
     concessionType: {
       type: String,

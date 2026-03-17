@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
     },
 
     year: {
-      type: String, // 🔥 STRING, not Number
+      type: String, // 
       required: true
     },
 
@@ -52,7 +52,14 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true
-    }
+    },
+    isVerified: {
+     type: Boolean,
+    default: false,
+   },
+
+   verificationToken: String,
+   verificationTokenExpiry: Date,
   },
   { timestamps: true }
 );

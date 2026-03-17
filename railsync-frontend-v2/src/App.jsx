@@ -14,6 +14,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import ApplyConcession from "./pages/student/ApplyConcession";
 import UploadDocuments from "./pages/student/UploadDocuments";
 import ApplicationStatus from "./pages/student/Status";
+import VerifyEmail from "./pages/student/VerifyEmail";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Terms from "./pages/Terms";
@@ -32,6 +33,7 @@ function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/student/login" element={<StudentLogin />} />
       <Route path="/student/register" element={<StudentRegister />} />
+      <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
       {/* STUDENT (PROTECTED) */}
       <Route

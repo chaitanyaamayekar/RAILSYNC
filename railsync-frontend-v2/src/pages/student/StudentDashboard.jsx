@@ -560,6 +560,7 @@ const StudentDashboard = () => {
   const [concession, setConcession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   /* ================= FETCH DATA ================= */
 
@@ -707,11 +708,11 @@ if (concession) {
 </button>
 
           <button
-            onClick={handleLogout}
-            className="text-left p-3 rounded-lg hover:bg-gray-100 text-red-500"
-          >
-            Logout
-          </button>
+  onClick={() => setShowLogoutModal(true)}
+  className="text-left p-3 rounded-lg hover:bg-gray-100 text-red-500"
+>
+  Logout
+</button>
 
         </div>
 
@@ -720,6 +721,42 @@ if (concession) {
       {/* MAIN CONTENT */}
 
       <div className="flex-1 flex flex-col">
+        {/* LOGOUT MODAL */}
+{showLogoutModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+    <div className="bg-white rounded-xl shadow-xl p-6 w-96 text-center">
+
+      <h2 className="text-lg font-semibold mb-3">
+        Confirm Logout
+      </h2>
+
+      <p className="text-gray-600 mb-6">
+        Are you sure you want to logout?
+      </p>
+
+      <div className="flex justify-center gap-4">
+
+        <button
+          onClick={() => setShowLogoutModal(false)}
+          className="px-4 py-2 rounded-lg border hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+        >
+          Yes, Logout
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
         {/* TOPBAR */}
 
