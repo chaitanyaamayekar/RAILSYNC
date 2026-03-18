@@ -17,9 +17,18 @@ export const registerStudent = async (req, res) => {
       address
     } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    // ✅ CHECK BOTH EMAIL + STUDENT ID
+    const existingUser = await User.findOne({
+      $or: [{ email }, { studentId }]
+    });
+
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({
+        message:
+          existingUser.email === email
+            ? "Email already registered"
+            : "Student ID already exists"
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -37,8 +46,6 @@ export const registerStudent = async (req, res) => {
       year,
       address,
       role: "student",
-
-      // ✅ IMPORTANT
       isVerified: false,
       verificationToken: token,
       verificationTokenExpiry: Date.now() + 1000 * 60 * 60,
@@ -56,11 +63,13 @@ export const registerStudent = async (req, res) => {
           <a href="${verifyURL}">${verifyURL}</a>
         `,
       });
+
       console.log("Verification email sent to:", email);
+
     } catch (emailError) {
       console.error("EMAIL ERROR:", emailError);
 
-      // ❗ rollback user if email fails
+      // rollback user if email fails
       await User.findByIdAndDelete(user._id);
 
       return res.status(500).json({
@@ -68,77 +77,26 @@ export const registerStudent = async (req, res) => {
       });
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Registration successful. Please verify your email.",
     });
 
   } catch (error) {
     console.error("REGISTER ERROR:", error);
-    res.status(500).json({ message: error.message });
+
+    // HANDLE DUPLICATE ERROR (IMPORTANT)
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "Email or Student ID already exists",
+      });
+    }
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
-// export const registerStudent = async (req, res) => {
-//   try {
-//     const {
-//       fullName,
-//       email,
-//       phone, 
-//       password,
-//       college,
-//       studentId,
-//       year,
-//       address
-//     } = req.body;
 
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.status(400).json({ message: "Email already registered" });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const token = crypto.randomBytes(32).toString("hex");
-
-//     const user = await User.create({
-//       name: fullName,
-//       email,
-//       phone,
-//       password: hashedPassword,
-//       college,
-//       studentId,
-//       year,
-//       address,
-//       role: "student",
-//       isVerified:
-//       verificationToken : token,
-//       verificationTokenExpiry: Date.now() + 1000 * 60 * 60, // 1 hour
-//     });
-//     // Verification link
-//     const verifyURL = `${process.env.CLIENT_URL}/verify-email/${token}`;
-
-//     await sendEmail({
-//       to: email,
-//       subject: "Verify your RailSync account",
-//       html: `
-//         <h2>Welcome to RailSync 🚆</h2>
-//         <p>Click below to verify your email:</p>
-//         <a href="${verifyURL}">${verifyURL}</a>
-//       `,
-//     });
-
-//     res.status(201).json({
-//       message: "Registration successful. Please check your email to verify your account.",
-//       user: {
-//         id: user._id,
-//         name: user.name,
-//         email: user.email,
-      
-//       }
-//     });
-//   } catch (error) {
-//     console.error("REGISTER ERROR:", error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 
 export const loginStudent = async (req, res) => {
@@ -147,13 +105,21 @@ export const loginStudent = async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    // USER NOT REGISTERED
-    if (!user.isVerified) {
-      return res.status(404).json({
-        success: false,
-        message: "Account not verified. Please verify your email first."
-      });
-    }
+if (!user) {
+  return res.status(404).json({
+    success: false,
+    message: "User not found"
+  });
+}
+
+// CHECK IF VERIFIED
+if (!user.isVerified) {
+  return res.status(403).json({
+    success: false,
+    message: "Account not verified. Please verify your email first."
+  });
+}
+
 
     const isMatch = await bcrypt.compare(password, user.password);
 
